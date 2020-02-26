@@ -11,14 +11,21 @@ import {
 } from '@material-ui/core'
 import EditIcon from '@material-ui/icons/Edit'
 import HighlightOffIcon from '@material-ui/icons/HighlightOff'
+import InfoIcon from '@material-ui/icons/Info'
+
+import useMediaQuery from '@material-ui/core/useMediaQuery'
+import { useTheme } from '@material-ui/core/styles'
 
 const Virtualized = props => {
 
     const {
         disableSortColumnIndexList = [0,3],
+        disableSortColumnIndexListMobile = [0,2],
         checkboxColumnKey = ["_checkbox"],
         actionColumnKey = ["_action"],
+        actionMobileColumnKey = ["_actionMobile"],
         listSelectedCheckboxID = ['1001', '1002'],
+        style,
     } = props
 
     const [state, setState] = useState({
@@ -29,6 +36,9 @@ const Virtualized = props => {
     // var currentColumnSort = null //สามารถใช้ทำ innitial column ที่ต้องการ sort ได้
     const currentColumnSort = useRef(null)
     const currentSortDirection = useRef('ASC')
+
+    const theme = useTheme()
+    const isMobileView = useMediaQuery(theme.breakpoints.down('sm'))
 
     // const list = [] // test data null
     const list = [
@@ -91,6 +101,17 @@ const Virtualized = props => {
         },
     ]
 
+    const headerDataActionMobile = [
+        {
+            key: '_actionMobile',
+            headerName: '',
+            columnWidth: '100',
+            align: 'center',
+        },
+    ]
+
+    const headerDataMobile = headerData.filter(item => (item.key === '_checkbox') || (item.key === 'name')).concat(headerDataActionMobile)
+
     useEffect(() => {
         setState(prevState => ({
             ...prevState,
@@ -138,7 +159,7 @@ const Virtualized = props => {
     }
 
     const headerRenderer = ({ label, columnIndex, columKey }) => {
-        const isEnableSort = (disableSortColumnIndexList.indexOf(columnIndex) === -1)
+        const isEnableSort = (isMobileView) ? (disableSortColumnIndexListMobile.indexOf(columnIndex) === -1) : (disableSortColumnIndexList.indexOf(columnIndex) === -1)
         return (
             <div style={{ cursor: (isEnableSort) ? "pointer" : "unset" }}>
                 <span style={{ fontWeight: "bold" }}>{label}</span>
@@ -188,6 +209,11 @@ const Virtualized = props => {
         console.log('onClickDelDialog', rowData)
     }
 
+    const onClickInfoDialog = (rowData) => e => {
+        e.stopPropagation()
+        console.log('onClickInfoDialog', rowData)
+    }
+
     const cellRenderer = ({ cellData, rowIndex, rowData, dataKey, align, classes }) => {
 
         let cellAlign = 'flex-start' //= (align) ? align : "left"
@@ -234,6 +260,15 @@ const Virtualized = props => {
                 </Grid>
             </Grid>
         }
+        else if (actionMobileColumnKey.indexOf(dataKey) !== -1) {
+            return <Grid container direction="row" justify={cellAlign}>
+                <Grid item>
+                    <IconButton aria-label="edit">
+                        <InfoIcon onClick={onClickInfoDialog(rowData)} />
+                    </IconButton>
+                </Grid>
+            </Grid>
+        }
         else {
             return (
                 <Grid container justify={cellAlign} style={{ width: "100%" }}>
@@ -248,12 +283,13 @@ const Virtualized = props => {
 
     return <VirtualizedView
         rowCount={state.sortedList.length}
-        columns={headerData}
+        columns={(isMobileView) ? headerDataMobile : headerData}
         sortProcess={sortProcess}
         rowGetter={rowGetter}
         headerRenderer={headerRenderer}
         onClickRow={handleClickRow}
         cellRenderer={cellRenderer}
+        style={style}
     />
 }
 

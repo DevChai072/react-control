@@ -12,8 +12,6 @@ const useStyles = makeStyles(theme => ({
         boxSizing: 'border-box',
     },
     table: {
-        // // temporary right-to-left patch, waiting for
-        // https://github.com/bvaughn/react-virtualized/issues/454
         '& .ReactVirtualized__Table__headerRow': {
             textAlign: "center",
             paddingLeft: "10px"
@@ -54,6 +52,7 @@ const VirtualizedView = props => {
         headerRenderer,
         onClickRow,
         cellRenderer,
+        style
     } = props
 
     const rowClassName = ({ index }) => { // index for each row
@@ -65,9 +64,10 @@ const VirtualizedView = props => {
     }
 
     return (
-        <div style={{ height: '200px' }}>
+        <div style={style}>
             <AutoSizer>
-                {({ width, height }) => ( 
+                {({ width, height }) => {
+                    return (
                     <Table
                         width={width}
                         height={height}
@@ -112,7 +112,7 @@ const VirtualizedView = props => {
                             )
                         }
                     </Table>
-                )}
+                )}}
             </AutoSizer>
         </div>
     )

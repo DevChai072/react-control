@@ -20,6 +20,8 @@ const WebLayoutView = props => {
     return (<>
         <AppBarMui />
         <ContentBlog>
+
+            {/* TextInput */}
             <TextInput 
                 format={{
                     id: "outlined-basic",
@@ -27,10 +29,13 @@ const WebLayoutView = props => {
                     variant: "outlined"
                 }}
             />
-
+            
+            {/* DatePick */}
             <DatePicker />
-
-            <Virtualized />
+            
+            {/* Virtualized */}
+            <Virtualized style={{ height: '200px' }}/>
+            
         </ContentBlog>
     </>)
 }
